@@ -1,0 +1,61 @@
+---
+version: 2
+
+defaults: &defaults
+  docker:
+  - image: deliveroo/circleci:0.2.2
+
+workflows:
+  version: 2
+  build_test_upload:
+    jobs:
+      - build_and_test
+      - upload:
+          requires:
+          - build_and_test
+          filters:
+            branches:
+              only:
+              - master
+
+jobs:
+  build_and_test:
+    <<: *defaults
+
+    steps:
+    - setup_remote_docker:
+        version: 17.09.0-ce
+        reusable: true
+        docker_layer_caching: true
+
+    - checkout
+
+    - run: make build test
+
+    - run:
+        name: Save zipped binary to the workspace
+        command: |
+          mkdir -p workspace
+          zip workspace/${CIRCLE_PROJECT_REPONAME}-${CIRCLE_SHA1}.zip ${CIRCLE_PROJECT_REPONAME}
+
+    - persist_to_workspace:
+        root: workspace
+        paths:
+          - '*.zip'
+
+  upload:
+    <<: *defaults
+
+    environment:
+    - TARGET: platform
+
+    steps:
+      - attach_workspace:
+          at: workspace
+
+      - run:
+          name: Push binary to S3
+          command: |
+            `print_env ${TARGET}`
+            unzip workspace/${CIRCLE_PROJECT_REPONAME}-${CIRCLE_SHA1}.zip
+            aws s3 cp "${CIRCLE_PROJECT_REPONAME}" "s3://roo-apps-private-binaries/${CIRCLE_PROJECT_REPONAME}"

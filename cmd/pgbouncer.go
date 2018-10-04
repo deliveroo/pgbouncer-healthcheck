@@ -48,6 +48,51 @@ type Pool struct {
 	PoolMode  string
 }
 
+// Client as returned by PGBouncer's SHOW CLIENTS
+type Client struct {
+	Type        string
+	User        string
+	Database    string
+	State       string
+	Addr        string
+	Port        int
+	LocalAddr   string
+	LocalPort   int
+	ConnectTime string
+	RequestTime string
+	Ptr         string
+	Link        string
+	RemotePid   int
+	TLS         string
+}
+
+// Server as returned by PGBouncer's SHOW SERVERS
+type Server struct {
+	Type        string
+	User        string
+	Database    string
+	State       string
+	Addr        string
+	Port        int
+	LocalAddr   string
+	LocalPort   int
+	ConnectTime string
+	RequestTime string
+	Ptr         string
+	Link        string
+	RemotePid   int
+	TLS         string
+}
+
+// Mem info record as returned by PGBouncer's SHOW MEM
+type Mem struct {
+	Name     string
+	Size     int
+	Used     int
+	Free     int
+	MemTotal int
+}
+
 func unwrapNullString(in sql.NullString) *string {
 	if in.Valid {
 		return &in.String
@@ -65,12 +110,12 @@ func getUsers(ctx context.Context, db *sql.DB) ([]User, error) {
 	var users []User
 	for rows.Next() {
 		var user User
-		var poolMode sql.NullString
+		var rawPoolMode sql.NullString
 
-		if err := rows.Scan(&user.Name, &poolMode); err != nil {
+		if err := rows.Scan(&user.Name, &rawPoolMode); err != nil {
 			return nil, errors.Wrap(err, "Failed to fetch row from results")
 		}
-		user.PoolMode = unwrapNullString(poolMode)
+		user.PoolMode = unwrapNullString(rawPoolMode)
 		users = append(users, user)
 	}
 	return users, nil
@@ -123,7 +168,8 @@ func getDatabases(ctx context.Context, db *sql.DB) ([]Database, error) {
 			&database.ReservePool,
 			&rawPoolMode,
 			&database.MaxConnections,
-			&database.CurrentConnections)
+			&database.CurrentConnections,
+		)
 		if err != nil {
 			return nil, errors.Wrap(err, "Failed to fetch row from results")
 		}
@@ -157,11 +203,108 @@ func getPools(ctx context.Context, db *sql.DB) ([]Pool, error) {
 			&pool.SvTested,
 			&pool.SvLogin,
 			&pool.MaxWait,
-			&pool.PoolMode)
+			&pool.PoolMode,
+		)
 		if err != nil {
 			return nil, errors.Wrap(err, "Failed to fetch row from results")
 		}
 		pools = append(pools, pool)
 	}
 	return pools, nil
+}
+
+func getClients(ctx context.Context, db *sql.DB) ([]Client, error) {
+	rows, err := db.QueryContext(ctx, "SHOW CLIENTS")
+	if err != nil {
+		return nil, errors.Wrap(err, "Failed to query PGBouncer")
+	}
+	defer rows.Close()
+
+	var clients []Client
+	for rows.Next() {
+		var client Client
+
+		err := rows.Scan(
+			&client.Type,
+			&client.User,
+			&client.Database,
+			&client.State,
+			&client.Addr,
+			&client.Port,
+			&client.LocalAddr,
+			&client.LocalPort,
+			&client.ConnectTime,
+			&client.RequestTime,
+			&client.Ptr,
+			&client.Link,
+			&client.RemotePid,
+			&client.TLS,
+		)
+		if err != nil {
+			return nil, errors.Wrap(err, "Failed to fetch row from results")
+		}
+		clients = append(clients, client)
+	}
+	return clients, nil
+}
+
+func getServers(ctx context.Context, db *sql.DB) ([]Server, error) {
+	rows, err := db.QueryContext(ctx, "SHOW SERVERS")
+	if err != nil {
+		return nil, errors.Wrap(err, "Failed to query PGBouncer")
+	}
+	defer rows.Close()
+
+	var servers []Server
+	for rows.Next() {
+		var server Server
+
+		err := rows.Scan(
+			&server.Type,
+			&server.User,
+			&server.Database,
+			&server.State,
+			&server.Addr,
+			&server.Port,
+			&server.LocalAddr,
+			&server.LocalPort,
+			&server.ConnectTime,
+			&server.RequestTime,
+			&server.Ptr,
+			&server.Link,
+			&server.RemotePid,
+			&server.TLS,
+		)
+		if err != nil {
+			return nil, errors.Wrap(err, "Failed to fetch row from results")
+		}
+		servers = append(servers, server)
+	}
+	return servers, nil
+}
+
+func getMems(ctx context.Context, db *sql.DB) ([]Mem, error) {
+	rows, err := db.QueryContext(ctx, "SHOW MEM")
+	if err != nil {
+		return nil, errors.Wrap(err, "Failed to query PGBouncer")
+	}
+	defer rows.Close()
+
+	var mems []Mem
+	for rows.Next() {
+		var mem Mem
+
+		err := rows.Scan(
+			&mem.Name,
+			&mem.Size,
+			&mem.Used,
+			&mem.Free,
+			&mem.MemTotal,
+		)
+		if err != nil {
+			return nil, errors.Wrap(err, "Failed to fetch row from results")
+		}
+		mems = append(mems, mem)
+	}
+	return mems, nil
 }

@@ -71,3 +71,42 @@ func handlePools(ctx context.Context, w http.ResponseWriter, db *sql.DB) error {
 	w.Write(resp)
 	return nil
 }
+
+func handleClients(ctx context.Context, w http.ResponseWriter, db *sql.DB) error {
+	clients, err := getClients(ctx, db)
+	if err != nil {
+		return errors.Wrap(err, "Error fetching clients from PGBouncer")
+	}
+	resp, err := json.Marshal(clients)
+	if err != nil {
+		return errors.Wrap(err, "Error converting clients to JSON")
+	}
+	w.Write(resp)
+	return nil
+}
+
+func handleServers(ctx context.Context, w http.ResponseWriter, db *sql.DB) error {
+	servers, err := getServers(ctx, db)
+	if err != nil {
+		return errors.Wrap(err, "Error fetching servers from PGBouncer")
+	}
+	resp, err := json.Marshal(servers)
+	if err != nil {
+		return errors.Wrap(err, "Error converting servers to JSON")
+	}
+	w.Write(resp)
+	return nil
+}
+
+func handleMems(ctx context.Context, w http.ResponseWriter, db *sql.DB) error {
+	mems, err := getMems(ctx, db)
+	if err != nil {
+		return errors.Wrap(err, "Error fetching mems from PGBouncer")
+	}
+	resp, err := json.Marshal(mems)
+	if err != nil {
+		return errors.Wrap(err, "Error converting mems to JSON")
+	}
+	w.Write(resp)
+	return nil
+}

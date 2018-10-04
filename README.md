@@ -1,11 +1,13 @@
-# EC2 docker healthcheck
+# PGBouncer healthcheck
 
 ## Introduction
 
-This implements a http `/health` check for ECS hosts.
+This implements a http `/health` check for PGBouncer hosts.
+This healthcheck provides a simple yes/no health response based
+on attempting to connect to PGBouncer and execute a request, as
+well as checking the Datadog agent.
 
-Similar to web containers that use ALB healthchecks to determine liveliness,
-we can healthcheck the EC2 hosts if the `dockerd` is behaving correctly.
+There are also several endpoints used for diagnostics.
 
 ## Building and running
 
@@ -15,7 +17,7 @@ This can be built on a local system with docker using the provided `Makefile`.
 
 You can then run the server binary
 
-    $ ./ec2-docker-healthcheck
+    $ ./pgbouncer-healthcheck
 
 
 ## Endpoints
@@ -25,8 +27,6 @@ You can then run the server binary
 This always returns a `200 OK`
 
 #### /health
-
-This endpoint checks if the local dockerd unix socket is available, and that
-the current storage graph driver is `devicemapper` to return a `200 OK`.
-
 The healthcheck fails with a `500 Internal Server Error` response.
+
+TODO: Add details of other endpoints

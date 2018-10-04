@@ -13,13 +13,25 @@ import (
 const port = ":8000"
 const connStr = "host=localhost port=6543 dbname=pgbouncer sslmode=disable"
 
-type requestHandler func(context.Context, http.ResponseWriter, *sql.DB) error
+type requestHandlerWithDB func(context.Context, http.ResponseWriter, *sql.DB) error
+type requestHandlerSimple func(http.ResponseWriter) error
 
-func makeHandler(db *sql.DB, h requestHandler) http.HandlerFunc {
+func makeHandlerWithDB(db *sql.DB, h requestHandlerWithDB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
 		defer cancel()
 		err := h(ctx, w, db)
+		if err != nil {
+			errMsg := fmt.Sprintf("An error occured: %s", err)
+			http.Error(w, errMsg, http.StatusInternalServerError)
+			return
+		}
+	}
+}
+
+func makeHandlerSimple(h requestHandlerSimple) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		err := h(w)
 		if err != nil {
 			errMsg := fmt.Sprintf("An error occured: %s", err)
 			http.Error(w, errMsg, http.StatusInternalServerError)
@@ -36,14 +48,17 @@ func initServer() *http.Server {
 
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("/health", makeHandler(db, handleHealth))
-	mux.HandleFunc("/users", makeHandler(db, handleUsers))
-	mux.HandleFunc("/configs", makeHandler(db, handleConfigs))
-	mux.HandleFunc("/databases", makeHandler(db, handleDatabases))
-	mux.HandleFunc("/pools", makeHandler(db, handlePools))
-	mux.HandleFunc("/clients", makeHandler(db, handleClients))
-	mux.HandleFunc("/servers", makeHandler(db, handleServers))
-	mux.HandleFunc("/mems", makeHandler(db, handleMems))
+	mux.HandleFunc("/health", makeHandlerWithDB(db, handleHealth))
+	mux.HandleFunc("/users", makeHandlerWithDB(db, handleUsers))
+	mux.HandleFunc("/configs", makeHandlerWithDB(db, handleConfigs))
+	mux.HandleFunc("/databases", makeHandlerWithDB(db, handleDatabases))
+	mux.HandleFunc("/pools", makeHandlerWithDB(db, handlePools))
+	mux.HandleFunc("/clients", makeHandlerWithDB(db, handleClients))
+	mux.HandleFunc("/servers", makeHandlerWithDB(db, handleServers))
+	mux.HandleFunc("/mems", makeHandlerWithDB(db, handleMems))
+
+	mux.HandleFunc("/dmesg", makeHandlerSimple(handleDmesg))
+	mux.HandleFunc("/processes", makeHandlerSimple(handleProcesses))
 
 	return &http.Server{
 		Handler: mux,

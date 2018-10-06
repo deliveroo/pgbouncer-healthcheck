@@ -57,8 +57,10 @@ func initServer() *http.Server {
 	mux.HandleFunc("/servers", makeHandlerWithDB(db, handleServers))
 	mux.HandleFunc("/mems", makeHandlerWithDB(db, handleMems))
 
-	mux.HandleFunc("/dmesg", makeHandlerSimple(handleDmesg))
-	mux.HandleFunc("/processes", makeHandlerSimple(handleProcesses))
+	mux.HandleFunc("/debug/dmesg", makeHandlerSimple(handleDmesg))
+	mux.HandleFunc("/debug/processes", makeHandlerSimple(handleProcesses))
+	mux.HandleFunc("/debug/meminfo", makeHandlerSimple(handleMeminfo))
+	mux.HandleFunc("/debug/logs", makeHandlerSimple(handleLogs))
 
 	return &http.Server{
 		Handler: mux,

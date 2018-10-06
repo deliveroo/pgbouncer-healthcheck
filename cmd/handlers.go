@@ -15,17 +15,23 @@ func handleHealth(ctx context.Context, w http.ResponseWriter, db *sql.DB) error 
 	return err
 }
 
+func returnJSON(w http.ResponseWriter, item interface{}) error {
+
+	resp, err := json.Marshal(item)
+	if err != nil {
+		return errors.Wrap(err, "Error converting response to JSON")
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(resp)
+	return nil
+}
+
 func handleUsers(ctx context.Context, w http.ResponseWriter, db *sql.DB) error {
 	users, err := getUsers(ctx, db)
 	if err != nil {
 		return errors.Wrap(err, "Error fetching users from PGBouncer")
 	}
-	resp, err := json.Marshal(users)
-	if err != nil {
-		return errors.Wrap(err, "Error converting users to JSON")
-	}
-	w.Write(resp)
-	return nil
+	return returnJSON(w, users)
 }
 
 func handleConfigs(ctx context.Context, w http.ResponseWriter, db *sql.DB) error {
@@ -33,12 +39,7 @@ func handleConfigs(ctx context.Context, w http.ResponseWriter, db *sql.DB) error
 	if err != nil {
 		return errors.Wrap(err, "Error fetching configs from PGBouncer")
 	}
-	resp, err := json.Marshal(configs)
-	if err != nil {
-		return errors.Wrap(err, "Error converting configs to JSON")
-	}
-	w.Write(resp)
-	return nil
+	return returnJSON(w, configs)
 }
 
 func handleDatabases(ctx context.Context, w http.ResponseWriter, db *sql.DB) error {
@@ -46,12 +47,7 @@ func handleDatabases(ctx context.Context, w http.ResponseWriter, db *sql.DB) err
 	if err != nil {
 		return errors.Wrap(err, "Error fetching databases from PGBouncer")
 	}
-	resp, err := json.Marshal(databases)
-	if err != nil {
-		return errors.Wrap(err, "Error converting databases to JSON")
-	}
-	w.Write(resp)
-	return nil
+	return returnJSON(w, databases)
 }
 
 func handlePools(ctx context.Context, w http.ResponseWriter, db *sql.DB) error {
@@ -59,12 +55,7 @@ func handlePools(ctx context.Context, w http.ResponseWriter, db *sql.DB) error {
 	if err != nil {
 		return errors.Wrap(err, "Error fetching pools from PGBouncer")
 	}
-	resp, err := json.Marshal(pools)
-	if err != nil {
-		return errors.Wrap(err, "Error converting pools to JSON")
-	}
-	w.Write(resp)
-	return nil
+	return returnJSON(w, pools)
 }
 
 func handleClients(ctx context.Context, w http.ResponseWriter, db *sql.DB) error {
@@ -72,12 +63,7 @@ func handleClients(ctx context.Context, w http.ResponseWriter, db *sql.DB) error
 	if err != nil {
 		return errors.Wrap(err, "Error fetching clients from PGBouncer")
 	}
-	resp, err := json.Marshal(clients)
-	if err != nil {
-		return errors.Wrap(err, "Error converting clients to JSON")
-	}
-	w.Write(resp)
-	return nil
+	return returnJSON(w, clients)
 }
 
 func handleServers(ctx context.Context, w http.ResponseWriter, db *sql.DB) error {
@@ -85,12 +71,7 @@ func handleServers(ctx context.Context, w http.ResponseWriter, db *sql.DB) error
 	if err != nil {
 		return errors.Wrap(err, "Error fetching servers from PGBouncer")
 	}
-	resp, err := json.Marshal(servers)
-	if err != nil {
-		return errors.Wrap(err, "Error converting servers to JSON")
-	}
-	w.Write(resp)
-	return nil
+	return returnJSON(w, servers)
 }
 
 func handleMems(ctx context.Context, w http.ResponseWriter, db *sql.DB) error {
@@ -98,12 +79,7 @@ func handleMems(ctx context.Context, w http.ResponseWriter, db *sql.DB) error {
 	if err != nil {
 		return errors.Wrap(err, "Error fetching mems from PGBouncer")
 	}
-	resp, err := json.Marshal(mems)
-	if err != nil {
-		return errors.Wrap(err, "Error converting mems to JSON")
-	}
-	w.Write(resp)
-	return nil
+	return returnJSON(w, mems)
 }
 
 func handleDmesg(w http.ResponseWriter) error {
@@ -119,6 +95,24 @@ func handleProcesses(w http.ResponseWriter) error {
 	output, err := getProcesses()
 	if err != nil {
 		return errors.Wrap(err, "Error fetching process list")
+	}
+	w.Write(output)
+	return nil
+}
+
+func handleMeminfo(w http.ResponseWriter) error {
+	output, err := getMeminfo()
+	if err != nil {
+		return errors.Wrap(err, "Error fetching memory info")
+	}
+	w.Write(output)
+	return nil
+}
+
+func handleLogs(w http.ResponseWriter) error {
+	output, err := getMeminfo()
+	if err != nil {
+		return errors.Wrap(err, "Error fetching logs")
 	}
 	w.Write(output)
 	return nil

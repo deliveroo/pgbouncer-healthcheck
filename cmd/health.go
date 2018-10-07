@@ -11,11 +11,20 @@ import (
 
 func checkHealth(ctx context.Context, db *sql.DB) error {
 	_, err := getUsers(ctx, db)
-	return errors.Wrap(err, "PGbouncer health check failed")
+	if err != nil {
+		return errors.Wrap(err, "PGbouncer health check failed")
+	}
+	err = getAgentHealth()
+	return err
 }
 
-func getAgentHealth([]byte, error) {
-
+func getAgentHealth() error {
+	psCmd := exec.Command("sudo", "datadog-agent", "health")
+	err := psCmd.Run()
+	if err != nil {
+		return errors.Wrap(err, "Datadog agent health command failed")
+	}
+	return nil
 }
 
 func getDmesg() ([]byte, error) {

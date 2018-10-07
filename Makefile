@@ -1,4 +1,4 @@
-APPNAME := ec2-docker-healthcheck
+APPNAME := pgbouncer-healthcheck
 build: $(APPNAME)
 
 $(APPNAME): cmd/*.go Gopkg.*

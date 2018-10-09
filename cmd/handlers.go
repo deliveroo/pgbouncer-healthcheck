@@ -110,7 +110,7 @@ func handleMeminfo(w http.ResponseWriter) error {
 }
 
 func handleLogs(w http.ResponseWriter) error {
-	output, err := getMeminfo()
+	output, err := getLogs()
 	if err != nil {
 		return errors.Wrap(err, "Error fetching logs")
 	}

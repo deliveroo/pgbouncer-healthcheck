@@ -47,7 +47,7 @@ func initServer() *http.Server {
 	}
 
 	mux := http.NewServeMux()
-
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {})
 	mux.HandleFunc("/health", makeHandlerWithDB(db, handleHealth))
 	mux.HandleFunc("/users", makeHandlerWithDB(db, handleUsers))
 	mux.HandleFunc("/configs", makeHandlerWithDB(db, handleConfigs))

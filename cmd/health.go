@@ -54,7 +54,7 @@ func getMeminfo() ([]byte, error) {
 }
 
 func getLogs() ([]byte, error) {
-	psCmd := exec.Command("journalctl", "--reverse", "-b", "--no-pager", "-n", "10")
+	psCmd := exec.Command("journalctl", "--reverse", "-b", "--no-pager", "-n", "50")
 	output, err := psCmd.Output()
 	if err != nil {
 		return nil, errors.Wrap(err, "Error fetching logs")

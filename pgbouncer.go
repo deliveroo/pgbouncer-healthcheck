@@ -93,6 +93,19 @@ type Mem struct {
 	MemTotal int
 }
 
+// Stat  record as returned by PGBouncer's SHOW STAT
+type Stat struct {
+	Database       string
+	TotalRequests  int
+	TotalReceived  int
+	TotalSent      int
+	TotalQueryTime int
+	AvgReq         int
+	AvgRecv        int
+	AvgSent        int
+	AvgQuery       int
+}
+
 func unwrapNullString(in sql.NullString) *string {
 	if in.Valid {
 		return &in.String
@@ -307,4 +320,34 @@ func getMems(ctx context.Context, db *sql.DB) ([]Mem, error) {
 		mems = append(mems, mem)
 	}
 	return mems, nil
+}
+
+func getStats(ctx context.Context, db *sql.DB) ([]Stat, error) {
+	rows, err := db.QueryContext(ctx, "SHOW STATS")
+	if err != nil {
+		return nil, errors.Wrap(err, "Failed to query PGBouncer")
+	}
+	defer rows.Close()
+
+	var stats []Stat
+	for rows.Next() {
+		var stat Stat
+
+		err := rows.Scan(
+			&stat.Database,
+			&stat.TotalRequests,
+			&stat.TotalReceived,
+			&stat.TotalSent,
+			&stat.TotalQueryTime,
+			&stat.AvgReq,
+			&stat.AvgRecv,
+			&stat.AvgSent,
+			&stat.AvgQuery,
+		)
+		if err != nil {
+			return nil, errors.Wrap(err, "Failed to fetch row from results")
+		}
+		stats = append(stats, stat)
+	}
+	return stats, nil
 }

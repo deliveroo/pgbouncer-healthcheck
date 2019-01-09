@@ -35,7 +35,7 @@ It checks the PGBouncer and also the Datadog Agent and requires both to be healt
 
 ## PGBouncer Information Endpoints
 
-### /users
+### /status/users
 Returns the results of PGBouncer's `SHOW USERS` command formatted as JSON.
 
 Example:
@@ -61,7 +61,7 @@ Example:
 ]
 ```
 
-### /configs
+### /status/configs
 
 Returns the results of PGBouncer's `SHOW CONFIG` command formatted as JSON.
 
@@ -103,7 +103,7 @@ Example:
 ```
 *(Truncated for brevity)*
 
-### /databases
+### /status/databases
 
 Returns the results of PGBouncer's `SHOW DATABASES` command formatted as JSON.
 This is essentially the content of the `[databases]` section in the config file.
@@ -139,7 +139,7 @@ Example:
 ]
 ```
 
-### /pools
+### /status/pools
 
 Returns the results of PGBouncer's `SHOW POOLS` command formatted as JSON.
 This is similar to `SHOW DATABASES`, except it's a product of that set by
@@ -178,7 +178,7 @@ Example:
 ]
 ```
 
-### /clients
+### /status/clients
 
 Returns the results of PGBouncer's `SHOW CLIENTS` command formatted as JSON.
 
@@ -220,7 +220,7 @@ Example:
 ]
 ```
 
-### /servers
+### /status/servers
 
 Returns the results of PGBouncer's `SHOW SERVERS` command formatted as JSON.
 
@@ -263,7 +263,7 @@ Example:
 ]
 ```
 
-### /mems
+### /status/mems
 
 Returns the results of PGBouncer's `SHOW MEM` command formatted as JSON.
 
@@ -316,9 +316,33 @@ Example:
 ]
 ```
 
+### /status/stats
+
+Returns the results of PGBouncer's `SHOW STATS` command formatted as JSON.
+
+Example:
+
+```json
+[
+  {
+    "Database": "pgbouncer",
+    "TotalRequests": 16,
+    "TotalReceived": 0,
+    "TotalSent": 0,
+    "TotalQueryTime": 0,
+    "AvgReq": 0,
+    "AvgRecv": 0,
+    "AvgSent": 0,
+    "AvgQuery": 0
+  }
+]
+
+```
+
 ## Server Debug Endpoints
 
-These were added to help debug unreachable servers.
+These were added to help debug unreachable servers. You need to start the binary with
+`ENABLE_DEBUG_ENDPOINTS=1` to make the available.
                  
 ### /debug/dmesg
 

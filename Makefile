@@ -1,13 +1,13 @@
 APPNAME := pgbouncer-healthcheck
 build: $(APPNAME)
 
-$(APPNAME): cmd/*.go Gopkg.*
+$(APPNAME): *.go Gopkg.*
 	-rm -fv $(APPNAME)
-	docker build -t $(APPNAME) .
+	docker build --target builder -t $(APPNAME) .
 	docker run --rm $(APPNAME) tar c .|tar x ./$(APPNAME)
 
 test: $(APPNAME)
-	docker run --rm $(APPNAME) go test -v
+	tests/run_tests.sh $(APPNAME)
 
 clean:
 	-rm $(APPNAME)

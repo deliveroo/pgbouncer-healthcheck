@@ -9,16 +9,22 @@ if [[ -t 2 ]]; then
     TC_RED="\e[00;31m"
     TC_GRN="\e[00;32m"
     TC_CYN="\e[00;36m"
+    TC_YEL="\e[01;33m"
     TC_LBLU="\e[01;34m"
+    TC_LPUR="\e[01;35m"
 
     TC_BLD="\e[1m"
+    TC_UND="\e[4m"
     TC_RST="\e[0m"
 else
     TC_RED=""
     TC_GRN=""
     TC_CYN=""
+    TC_YEL=""
     TC_LBLU=""
+    TC_LPUR=""
     TC_BLD=""
+    TC_UND=""
     TC_RST=""
 fi
 
@@ -32,6 +38,9 @@ FAIL_HDR="${TC_RED}FAIL: ${TC_RST}"
 PASS_HDR="${TC_GRN}PASS: ${TC_RST}"
 INFO_HDR="${TC_CYN}INFO: ${TC_RST}"
 FATL_HDR="${TC_RED}FATAL: ${TC_RST}"
+TITLE_HDR="${TC_UND}${TC_LPUR}**: "
+TITLE_END=" :**${TC_RST}"
+DESC_HDR="${TC_YEL}>>>> ${TC_RST}"
 
 if [[ $VERBOSE -gt 0 ]]; then
    curl_opts=("--silent" "--output" "/dev/stderr" "--write-out" "%{http_code}")
@@ -106,6 +115,14 @@ info() {
 fatal() {
     echo -e "$FATL_HDR$*">&2
     exit 1
+}
+
+title() {
+    echo -e "$TITLE_HDR$*$TITLE_END\n">&2
+}
+
+desc() {
+    echo -e "\n\n$DESC_HDR$*">&2
 }
 
 test_ok_endpoint() {

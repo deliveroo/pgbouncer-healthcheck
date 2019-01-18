@@ -30,7 +30,9 @@ jobs:
 
     - checkout
 
-    - run: make build test
+    - run: make build
+    
+    - run: make test
 
     - run:
         name: Save zipped binary to the workspace

@@ -10,7 +10,7 @@ run_test() {
     echo "Running test: $1"
     echo "==================================="
     echo ""
-    if docker run -it --rm -e VERBOSE "$APPNAME-test" "/tests/$1"; then
+    if docker run -it --rm -e VERBOSE -w="/tests" "$APPNAME" "/tests/$1"; then
         pass "-* $1 script passed *-"
     else
         fail "-* $1 script failed *-"
@@ -21,8 +21,6 @@ APPNAME=${1:-pgbouncer-healthcheck}
 shift
 
 export VERBOSE=${VERBOSE:-0}
-
-docker build --target tester -t "$APPNAME-test" .. || fatal "Failed to build test container"
 
 if [[ $# -eq 0 ]]; then
     mapfile -t tests < <(find scripts -name '*.sh' ! -name 'common.sh' -printf '%f\n')

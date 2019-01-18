@@ -2,9 +2,11 @@ package main
 
 import (
 	"database/sql"
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/kelseyhightower/envconfig"
@@ -48,12 +50,28 @@ func initDB() {
 	}
 }
 
+func version() {
+	fmt.Fprintf(os.Stderr, "%s version %s\n", os.Args[0], VERSION)
+	fmt.Fprintf(os.Stderr, "built %s\n", BUILD_DATE)
+}
+
 func main() {
 	if err := envconfig.Process("", &config); err != nil {
 		log.Fatalf("Could not process configuration: %s", err)
 	}
+	flag.Usage = func() {
+		version()
+		fmt.Fprintln(os.Stderr, "\nUsage:")
+		flag.PrintDefaults()
+		if err := envconfig.Usage("", &config); err != nil {
+			log.Fatalf("Could not process configuration: %s", err)
+		}
+	}
+	flag.Parse()
 	initDB()
 	webserver := initServer()
 	log.Printf("Listening on port %d", config.Port)
-	webserver.ListenAndServe()
+	if err := webserver.ListenAndServe(); err != nil {
+		log.Fatalf("Error occured while listening for connections: %s", err)
+	}
 }

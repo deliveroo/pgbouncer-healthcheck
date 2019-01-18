@@ -30,7 +30,7 @@ func handleHealth(ctx context.Context, w http.ResponseWriter, _ httprouter.Param
 		}
 	}
 	if config.CheckDDAgent {
-		return getAgentHealth()
+		return getAgentHealth(ctx)
 	}
 	return nil
 }
@@ -43,8 +43,8 @@ func probeLocalPort(port int) error {
 	return err
 }
 
-func getAgentHealth() error {
-	psCmd := exec.Command("sudo", "-n", "datadog-agent", "health")
+func getAgentHealth(ctx context.Context) error {
+	psCmd := exec.CommandContext(ctx, "sudo", "-n", "datadog-agent", "health")
 	err := psCmd.Run()
 	if err != nil {
 		return errors.Wrap(err, "Datadog agent health command failed")

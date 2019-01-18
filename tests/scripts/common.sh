@@ -171,6 +171,12 @@ test_notok_status() {
     test_notok_endpoint "/status/users" "Status Endpoint"
 }
 
+make_dd_stub_hang() {
+    printf '#!/bin/sh\n' >"$DDAGENT_FAKE"
+    printf 'sleep 1000000\n' >"$DDAGENT_FAKE"
+    chmod 755 "$DDAGENT_FAKE"
+}
+
 make_dd_stub_pass() {
     printf '#!/bin/true\n' >"$DDAGENT_FAKE"
     chmod 755 "$DDAGENT_FAKE"

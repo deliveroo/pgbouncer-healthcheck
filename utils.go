@@ -41,8 +41,8 @@ func makeRequestHandler(h requestHandler) httprouter.Handle {
 }
 
 func makeRequestHandlerCommand(desc string, cmdName string, cmdArg ...string) httprouter.Handle {
-	return makeRequestHandler(func(w http.ResponseWriter, ps httprouter.Params) error {
-		cmd := exec.Command(cmdName, cmdArg...)
+	return makeRequestHandlerWithContext(func(ctx context.Context, w http.ResponseWriter, ps httprouter.Params) error {
+		cmd := exec.CommandContext(ctx, cmdName, cmdArg...)
 		output, err := cmd.Output()
 		if err != nil {
 			return errors.Wrapf(err, "Error fetching %s", desc)

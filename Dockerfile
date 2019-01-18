@@ -10,6 +10,7 @@ ADD build.sh $DIR/
 ADD Gopkg.toml $DIR/
 ADD Gopkg.lock $DIR/
 ADD *.go $DIR/
+ADD VERSION $DIR/
 
 RUN $DIR/vendor.sh
 RUN $DIR/build.sh

@@ -30,7 +30,9 @@ jobs:
 
     - checkout
 
-    - run: make build test
+    - run: make build
+    
+    - run: make test
 
     - run:
         name: Save zipped binary to the workspace
@@ -59,3 +61,4 @@ jobs:
             `print_env ${TARGET}`
             unzip workspace/${CIRCLE_PROJECT_REPONAME}-${CIRCLE_SHA1}.zip
             aws s3 cp "${CIRCLE_PROJECT_REPONAME}" "s3://roo-apps-private-binaries/${CIRCLE_PROJECT_REPONAME}"
+            aws s3 cp "${CIRCLE_PROJECT_REPONAME}*.tar.gz" "s3://roo-apps-private-binaries/${CIRCLE_PROJECT_REPONAME}"

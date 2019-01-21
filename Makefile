@@ -21,7 +21,7 @@ test:
 
 clean:
 	-rm $(APPNAME)
-	-rm $(APPNAME)-$(VERSION).tar.gz
+	-rm $(APPNAME)-*.tar.gz
 
 # Use this target to run dep commands
 #

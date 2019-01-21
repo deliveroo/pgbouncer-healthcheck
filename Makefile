@@ -46,4 +46,4 @@ clean:
 dep:
 	docker run -it --rm -v $(shell pwd):/go/src/github.com/deliveroo/$(APPNAME) $(APPNAME) dep $(COMMAND)
 
-.PHONY: build clean dep test
+.PHONY: build clean dep test stash unstash upload

@@ -52,6 +52,8 @@ jobs:
     - TARGET: platform
 
     steps:
+      - checkout
+
       - attach_workspace:
           at: workspace
 

@@ -23,4 +23,3 @@ RUN chmod 755 /tests/*
 
 RUN $DIR/vendor.sh
 RUN $DIR/build.sh
-

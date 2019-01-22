@@ -19,6 +19,31 @@ You can then run the server binary
 
     $ ./pgbouncer-healthcheck
 
+## Configuration
+
+The binary takes its configuration from several environment variables.
+
+### Postgres connection string for PGBouncer connection
+
+The connection string comes from the env var `CONNSTR`. The default is
+`host=localhost port=6543 dbname=pgbouncer sslmode=disable`. This should
+be fine for most use cases.
+
+The intention is that the username and password will be supplied by setting the
+`PGUSER` and `PGPASSWORD` standard variables.
+
+### Other paramteres
+
+- `PORT`: The TCP port the daemon should use to listen for HTTP connections (default: 8000)
+- `ENHANCED_CHECK`: If true, test the PGBouncer health by connecting and sending a query.
+    If false, use a simple port probe. (default: false)
+- `CHECK_DDAGENT`: If true, the `/health` endpoint will also run `datadog-agent health` and
+    the return value will affect the health status (default: false)
+- `PGBOUNCER_PORT`: The TCP port used if using the basic port probe healthcheck (default: 6543)
+- `ENABLE_DEBUG_ENDPOINTS`: If true, the extra `/debug/` endpoints will be enabled. See below (default: false)
+
+The result of the defaults is that the standard mode is just to do a TCP port probe of 6543
+on the localhost to test if PGBouncer is alive.
 
 ## Main Endpoints
 

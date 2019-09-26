@@ -32,7 +32,7 @@ be fine for most use cases.
 The intention is that the username and password will be supplied by setting the
 `PGUSER` and `PGPASSWORD` standard variables.
 
-### Other paramteres
+### Other parameters
 
 - `PORT`: The TCP port the daemon should use to listen for HTTP connections (default: 8000)
 - `ENHANCED_CHECK`: If true, test the PGBouncer health by connecting and sending a query.
@@ -56,7 +56,8 @@ This always returns a `200 OK`
 
 ### /health
 The healthcheck returns a 200 OK response or a `500 Internal Server Error` response.
-It checks the PGBouncer and also the Datadog Agent and requires both to be healthy.
+It will probe the PGBouncer using a method depending on  `ENHANCED_CHECK`.
+If `CHECK_DDAGENT` is true it will also check the Datadog Agent.
 
 ## PGBouncer Information Endpoints
 

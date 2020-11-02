@@ -23,8 +23,10 @@ workflows:
   version: 2
   build_test_upload:
     jobs:
-      - build_and_test
+      - build_and_test:
+          <<: *global_context
       - upload:
+          <<: *global_context
           requires:
           - build_and_test
           filters:

@@ -1,16 +1,32 @@
----
+# GLOBAL-ANCHORS - DockerHub Authentication changes applied - PROD-1431 / PROD-1435
+global_dockerhub_login: &global_dockerhub_login
+  run:
+    name: Authenticate with hub.docker.com - DockerHub
+    command: docker login -u $GLOBAL_DOCKERHUB_USERNAME -p $GLOBAL_DOCKERHUB_PASSWORD
+global_context: &global_context
+  context:
+    - org-global
+global_remote_docker: &global_remote_docker
+  version: 19.03.13
+global_dockerhub_auth: &global_dockerhub_auth
+  auth:
+    username: $GLOBAL_DOCKERHUB_USERNAME
+    password: $GLOBAL_DOCKERHUB_PASSWORD
 version: 2
 
 defaults: &defaults
   docker:
-  - image: deliveroo/circleci:0.2.2
+  - image: deliveroo/circleci:0.4.2
+    <<: *global_dockerhub_auth
 
 workflows:
   version: 2
   build_test_upload:
     jobs:
-      - build_and_test
+      - build_and_test:
+          <<: *global_context
       - upload:
+          <<: *global_context
           requires:
           - build_and_test
           filters:
@@ -24,10 +40,11 @@ jobs:
 
     steps:
     - setup_remote_docker:
-        version: 17.09.0-ce
+        <<: *global_remote_docker
         reusable: true
         docker_layer_caching: true
 
+    - *global_dockerhub_login
     - checkout
 
     - run: make clean
@@ -52,6 +69,7 @@ jobs:
     - TARGET: platform
 
     steps:
+      - *global_dockerhub_login
       - checkout
 
       - attach_workspace:

@@ -1,3 +1,4 @@
 pgbouncer-healthcheck
 pgbouncer-healthcheck*.tar.gz
 workspace/*
+.git/

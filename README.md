@@ -386,3 +386,4 @@ Returns the contents of `/proc/meminfo`.
 
 Returns the output of `journalctl --reverse -b --no-pager -n 50`
 
+test

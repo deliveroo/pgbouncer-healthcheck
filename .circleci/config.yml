@@ -7,7 +7,7 @@ global_context: &global_context
   context:
     - org-global
 global_remote_docker: &global_remote_docker
-  version: 19.03.13
+  version: default
 global_dockerhub_auth: &global_dockerhub_auth
   auth:
     username: $GLOBAL_DOCKERHUB_USERNAME
@@ -16,7 +16,7 @@ version: 2
 
 defaults: &defaults
   docker:
-  - image: deliveroo/circleci:0.4.2
+  - image: deliveroo/circleci:4
     <<: *global_dockerhub_auth
 
 workflows:

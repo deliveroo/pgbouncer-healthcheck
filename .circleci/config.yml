@@ -7,7 +7,7 @@ global_context: &global_context
   context:
     - org-global
 global_remote_docker: &global_remote_docker
-  version: docker
+  version: default
 global_dockerhub_auth: &global_dockerhub_auth
   auth:
     username: $GLOBAL_DOCKERHUB_USERNAME

@@ -16,7 +16,7 @@ version: 2
 
 defaults: &defaults
   docker:
-  - image: deliveroo/circleci:0.4.2
+  - image: deliveroo/circleci:4.10.0
     <<: *global_dockerhub_auth
 
 workflows:
